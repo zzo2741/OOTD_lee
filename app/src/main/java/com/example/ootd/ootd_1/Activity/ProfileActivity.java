@@ -1,12 +1,14 @@
 package com.example.ootd.ootd_1.Activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.signature.ObjectKey;
 import com.example.ootd.ootd_1.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -14,6 +16,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.UUID;
 
 import model.SignUpModel;
 
@@ -21,10 +27,14 @@ public class ProfileActivity extends AppCompatActivity {
 
     private Button logoutBtn, checkBtn, modifyBtn;
     private TextView name, email, sex, day;
+    private ImageView iv_image;
     private DatabaseReference mDatabase;
     private String uid;
     private SignUpModel user;
     private FirebaseAuth mAuth;
+    private StorageReference gsReference;
+    private FirebaseStorage storage;
+
 
 
     @Override
@@ -35,6 +45,7 @@ public class ProfileActivity extends AppCompatActivity {
         logoutBtn = findViewById(R.id.logoutBtn);
         checkBtn = findViewById(R.id.checkBtn);
         modifyBtn = findViewById(R.id.modifyBtn);
+        iv_image = findViewById(R.id.iv_image);
 
         name = findViewById(R.id.tvName_input);
         email = findViewById(R.id.tvID_input);
@@ -42,8 +53,19 @@ public class ProfileActivity extends AppCompatActivity {
         day = findViewById(R.id.tvDay_input);
 
         mAuth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
         uid = mAuth.getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(uid);
+
+        //테스트
+        String filename = uid + ".jpg";
+        storage = FirebaseStorage.getInstance();
+        gsReference = storage.getReference().child("profileimage/" + filename);
+
+        GlideApp.with(this)
+                .load(gsReference)
+                .signature(new ObjectKey(UUID.randomUUID().toString()))
+                .into(iv_image);
 
         mDatabase.addValueEventListener(new ValueEventListener() { //데이터베이스 읽어올때
             @Override

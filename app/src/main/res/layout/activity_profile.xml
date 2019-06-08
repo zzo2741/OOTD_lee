@@ -38,11 +38,12 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <ImageButton
-            android:id="@+id/imBtn"
+        <ImageView
+            android:id="@+id/iv_image"
             android:layout_below="@+id/tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:scaleType="fitXY"
             android:layout_marginTop="30dp"
             android:layout_centerHorizontal="true"
             android:background="@drawable/img_add" />

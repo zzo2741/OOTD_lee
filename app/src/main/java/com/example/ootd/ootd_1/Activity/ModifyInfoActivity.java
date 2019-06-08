@@ -1,9 +1,9 @@
 package com.example.ootd.ootd_1.Activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.signature.ObjectKey;
 import com.example.ootd.ootd_1.Fragment.BottomSheetDialog;
 import com.example.ootd.ootd_1.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,6 +20,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.UUID;
 
 import model.SignUpModel;
 
@@ -32,6 +37,12 @@ public class ModifyInfoActivity extends AppCompatActivity {
 
     private DatabaseReference mUser;
     private FirebaseUser cUser;
+    private FirebaseAuth mAuth;
+    private String uid;
+
+    //테스트
+    private StorageReference ref;
+    private FirebaseStorage storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +61,20 @@ public class ModifyInfoActivity extends AppCompatActivity {
         comBtn = findViewById(R.id.comBtn);
         imBtn = findViewById(R.id.imBtn);
 
+        mAuth = FirebaseAuth.getInstance();
+        uid = mAuth.getUid();
         mUser = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getUid());
         cUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        //테스트
+        String filename = uid + ".jpg";
+        storage = FirebaseStorage.getInstance();
+        ref = storage.getReference().child("profileimage/" + filename);
+
+        GlideApp.with(this)
+                .load(ref)
+                .signature(new ObjectKey(UUID.randomUUID().toString()))
+                .into(imBtn);
 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override

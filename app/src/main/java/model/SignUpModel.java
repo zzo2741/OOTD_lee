@@ -13,16 +13,18 @@ public class SignUpModel implements Serializable {
     public String user_name = "";
     public String user_sex = "";
     public String user_day = "";
+    public String user_image = "";
 
     public SignUpModel() {
     }
 
-    public SignUpModel(String user_email, String user_password, String user_name, String user_sex, String user_day) {
+    public SignUpModel(String user_email, String user_password, String user_name, String user_sex, String user_day, String user_image) {
         this.user_email = user_email;
         this.user_password = user_password;
         this.user_name = user_name;
         this.user_sex = user_sex;
         this.user_day = user_day;
+        this.user_image = user_image;
     }
 
     @Exclude
@@ -33,6 +35,7 @@ public class SignUpModel implements Serializable {
         result.put("user_name", user_name);
         result.put("user_sex", user_sex);
         result.put("user_day", user_day);
+        result.put("user_image", user_image);
         return result;
     }
 }
