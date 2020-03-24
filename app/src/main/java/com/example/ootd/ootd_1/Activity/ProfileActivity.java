@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.signature.ObjectKey;
 import com.example.ootd.ootd_1.R;
+import com.example.ootd.ootd_1.model.SignUpModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,20 +22,17 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.UUID;
 
-import model.SignUpModel;
-
 public class ProfileActivity extends AppCompatActivity {
 
     private Button logoutBtn, checkBtn, modifyBtn;
     private TextView name, email, sex, day;
     private ImageView iv_image;
-    private DatabaseReference mDatabase;
-    private String uid;
     private SignUpModel user;
     private FirebaseAuth mAuth;
     private StorageReference gsReference;
     private FirebaseStorage storage;
-
+    private String uid;
+    private DatabaseReference mDatabase;
 
 
     @Override
@@ -104,6 +102,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent in2 = new Intent(ProfileActivity.this, MainActivity.class);
                 startActivity(in2);
+                finish();
             }
         });
 
@@ -112,6 +111,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent in3 = new Intent(ProfileActivity.this, ModifyInfoActivity.class);
                 startActivity(in3);
+                finish();
             }
         });
 

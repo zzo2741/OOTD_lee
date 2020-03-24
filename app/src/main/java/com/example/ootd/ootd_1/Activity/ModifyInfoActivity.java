@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.bumptech.glide.signature.ObjectKey;
 import com.example.ootd.ootd_1.Fragment.BottomSheetDialog;
 import com.example.ootd.ootd_1.R;
+import com.example.ootd.ootd_1.model.SignUpModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,8 +25,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.UUID;
-
-import model.SignUpModel;
 
 public class ModifyInfoActivity extends AppCompatActivity {
 
@@ -79,8 +78,9 @@ public class ModifyInfoActivity extends AppCompatActivity {
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(ModifyInfoActivity.this, ProfileActivity.class);
-                startActivity(in);
+                Intent in1 = new Intent(ModifyInfoActivity.this, ProfileActivity.class);
+                startActivity(in1);
+                finish();
             }
         });
         homeBtn.setOnClickListener(new View.OnClickListener() {
@@ -88,6 +88,7 @@ public class ModifyInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent in2 = new Intent(ModifyInfoActivity.this, MainActivity.class);
                 startActivity(in2);
+                finish();
             }
         });
         comBtn.setOnClickListener(new View.OnClickListener() {

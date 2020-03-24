@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".Activity.PhotoActivity">
+
     <RelativeLayout
-        android:id="@+id/photoInfo_Rl"
+        android:id="@+id/rl_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#EDEDED">
+
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -27,52 +29,70 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@id/tvTitle"
-            android:layout_marginRight="20dp"
-            android:layout_toLeftOf="@id/homeBtn"
-            android:background="@drawable/arrow" />
-
-        <ImageButton
-            android:id="@+id/homeBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/tvTitle"
             android:layout_alignParentRight="true"
             android:layout_marginRight="20dp"
-            android:background="@drawable/home" />
+            android:background="@drawable/arrow" />
+
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <ImageView
             android:id="@+id/ivPhoto"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:background="@drawable/ot"/>
-        <ImageButton
-            android:id="@+id/shareBtn"
-            android:layout_below="@+id/ivPhoto"
+            android:layout_height="450dp"
+            android:layout_gravity="center_horizontal"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/bmTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:background="@drawable/share"/>
+            android:layout_below="@+id/ivPhoto"
+            android:layout_alignBaseline="@+id/bookmarkBtn"
+            android:layout_margin="10dp"
+            android:text="즐겨찾기"
+            android:textColor="@android:color/black"
+            android:textSize="15dp" />
+
         <ImageButton
             android:id="@+id/bookmarkBtn"
-            android:layout_below="@+id/ivPhoto"
-            android:layout_toRightOf="@+id/shareBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/star1"/>
+            android:layout_below="@+id/ivPhoto"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toRightOf="@id/bmTv"
+            android:adjustViewBounds="true"
+            android:background="@drawable/plus"
+            android:scaleType="fitCenter" />
+
+        <ImageButton
+            android:id="@+id/bookmark_remove_Btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivPhoto"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toRightOf="@+id/bookmarkBtn"
+            android:adjustViewBounds="true"
+            android:background="@drawable/minus"
+            android:scaleType="fitCenter" />
+
+
         <EditText
             android:id="@+id/edMemo"
-            android:layout_below="@+id/shareBtn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_below="@+id/bookmarkBtn"
             android:background="@drawable/back"
-            android:padding="10dp"
+            android:gravity="clip_vertical"
             android:hint="메모"
-            android:gravity="clip_vertical"/>
+            android:padding="10dp" />
     </RelativeLayout>
 
 </LinearLayout>

@@ -83,6 +83,9 @@ public class PhotoCaptureActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //업로드
                 uploadFile();
+                Intent in2 = new Intent(PhotoCaptureActivity.this, MainActivity.class);
+                startActivity(in2);
+                finish();
             }
         });
         backBtn.setOnClickListener(new View.OnClickListener() {
@@ -90,6 +93,7 @@ public class PhotoCaptureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent in = new Intent(PhotoCaptureActivity.this, ModifyInfoActivity.class);
                 startActivity(in);
+                finish();
             }
         });
         homeBtn.setOnClickListener(new View.OnClickListener() {
@@ -97,6 +101,7 @@ public class PhotoCaptureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent in2 = new Intent(PhotoCaptureActivity.this, MainActivity.class);
                 startActivity(in2);
+                finish();
             }
         });
 

@@ -81,6 +81,9 @@ public class ImageCaptureActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //업로드
                 uploadFile();
+                Intent in2 = new Intent(ImageCaptureActivity.this, MainActivity.class);
+                startActivity(in2);
+                finish();
             }
         });
         backBtn.setOnClickListener(new View.OnClickListener() {
@@ -88,6 +91,7 @@ public class ImageCaptureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent in = new Intent(ImageCaptureActivity.this, ModifyInfoActivity.class);
                 startActivity(in);
+                finish();
             }
         });
         homeBtn.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +99,7 @@ public class ImageCaptureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent in2 = new Intent(ImageCaptureActivity.this, MainActivity.class);
                 startActivity(in2);
+                finish();
             }
         });
 

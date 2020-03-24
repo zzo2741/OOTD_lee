@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".Activity.MainActivity">
+
     <RelativeLayout
         android:id="@+id/profile_Rl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="20dp">
+        android:layout_marginRight="20dp">
 
         <TextView
             android:id="@+id/tvTitle"
@@ -19,28 +20,30 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
             android:text="O O T D"
             android:textColor="@android:color/black"
             android:textSize="30sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="20dp"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvName"
-            android:layout_marginTop="20dp"
-            android:layout_below="@id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvTitle"
+            android:layout_marginTop="20dp"
             android:text="성명"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black" />
+
         <TextView
             android:id="@+id/tvEmail"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/tvName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/tvName"
+            android:layout_marginTop="20dp"
             android:text="이메일"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black" />
+
         <ImageView
             android:id="@+id/iv_pi"
             android:layout_width="wrap_content"
@@ -48,60 +51,53 @@
             android:layout_below="@id/tvTitle"
             android:layout_alignParentRight="true"
             android:background="@drawable/img_add"
-            android:scaleType="fitXY"/>
+            android:scaleType="fitXY" />
+
         <Button
             android:id="@+id/modifyBtn"
-            android:layout_below="@id/iv_pi"
-            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="30dp"
+            android:layout_below="@id/iv_pi"
+            android:layout_marginTop="20dp"
             android:background="@android:color/black"
-            android:text="프로필 확인"
+            android:text="프로필"
             android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/addPhotoBtn"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_below="@id/modifyBtn"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/black"
+            android:text="사진추가"
+            android:textColor="@android:color/white" />
+
     </RelativeLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/profile_Rl">
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tab_layout"
+
+        <FrameLayout
+            android:id="@+id/fragment_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabIndicatorColor="@android:color/black"
-            android:layout_marginTop="10dp">
+            android:layout_marginBottom="?attr/actionBarSize">
+        </FrameLayout>
 
-            <android.support.design.widget.TabItem
-                android:id="@+id/tabItem1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:icon="@drawable/badukpan"/>
-
-            <android.support.design.widget.TabItem
-                android:id="@+id/tabItem2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:icon="@drawable/scroll" />
-
-            <android.support.design.widget.TabItem
-                android:id="@+id/tabItem3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:icon="@drawable/star"/>
-        </android.support.design.widget.TabLayout>
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewpager"
-            android:layout_below="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </android.support.v4.view.ViewPager>
-        <Button
-            android:id="@+id/addPhotoBtn"
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/bottom_navigation_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:itemIconTint="@drawable/bottom_section_color"
+            app:itemTextColor="@drawable/bottom_section_color"
+            app:labelVisibilityMode="labeled"
             android:layout_alignParentBottom="true"
-            android:background="@android:color/black"
-            android:text="사진추가"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"/>
+            android:background="?android:attr/windowBackground"
+            app:menu="@menu/menu_bottom" />
+
     </RelativeLayout>
 </RelativeLayout>

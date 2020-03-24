@@ -2,8 +2,10 @@ package com.example.ootd.ootd_1.Activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -14,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -28,12 +31,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.example.ootd.ootd_1.Fragment.GridFragment;
 import com.example.ootd.ootd_1.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Transaction;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,23 +62,23 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
 
 public class AddImageActivity extends AppCompatActivity {
-
     private static final String TAG = "PhotoCaptureActivity";
     private static final int REQUEST_TAKE_PHOTO = 22;
     private static final int REQUEST_IMAGE_CROP = 44;
     //
+    String myIp = "192.168.0.46";
     Bitmap bit;
     Post post;
     BitmapDrawable d;
+    String Result[];
     String base;
     String e;
     String type;
     String sync;
-    EditText edit1;
-    TextView text1;
     private ImageButton backBtn;
     private int id1, id2;
     private FirebaseAuth mAuth;
@@ -82,7 +90,7 @@ public class AddImageActivity extends AppCompatActivity {
     private RadioGroup radioGroup1, radioGroup2;
     private RadioButton male_btn, female_btn, top_btn, bottom_btn, rb1, rb2;
     private Spinner sp_num;
-
+    private Activity activity;
     public static String encodeToBase64(Bitmap image) {
         Bitmap immagex = image;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -97,7 +105,7 @@ public class AddImageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_image);
-
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 1);
         add_image_btn = findViewById(R.id.add_image_btn);
         to_server_btn = findViewById(R.id.to_server_btn);
         iv_image = findViewById(R.id.iv_image);
@@ -105,11 +113,14 @@ public class AddImageActivity extends AppCompatActivity {
         uid = mAuth.getUid();
         mUser = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getUid());
         tedPermission();
-
+        activity = this;
         //
-        edit1 = findViewById(R.id.edit1);
-        text1 = findViewById(R.id.text1);
 
+        //male_btn, female_btn, top_btn, bottom_btn,
+        male_btn = findViewById(R.id.male_btn);
+        female_btn = findViewById(R.id.female_btn);
+        top_btn = findViewById(R.id.top_btn);
+        bottom_btn = findViewById(R.id.bottom_btn);
 
         backBtn = findViewById(R.id.backBtn);
         radioGroup1 = findViewById(R.id.radioGroup1);
@@ -125,7 +136,10 @@ public class AddImageActivity extends AppCompatActivity {
         add_image_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CameraOpen();
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .start(AddImageActivity.this);
+                //CameraOpen();
             }
         });
 
@@ -146,145 +160,47 @@ public class AddImageActivity extends AppCompatActivity {
         });
     }
 
-    private void CameraOpen() {
-        try {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, photoURI);
-            startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, "camera error", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void goServerFile() {
-        final Bitmap[] Result = new Bitmap[1];
+
+        Result = null;
+
         d = (BitmapDrawable) iv_image.getDrawable();
         bit = d.getBitmap();
         base = encodeToBase64(bit);
-        e = edit1.getText().toString();
+        e = sp_num.getSelectedItem().toString();
         type = "mantop";
         sync = "false";
         post = new Post();
         try {
-            Result[0] = post.execute().get();
+            Result = post.execute().get();
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         } catch (ExecutionException e1) {
             e1.printStackTrace();
         }
-        Log.d("result", String.valueOf(Result[0]));
-        iv_image.setImageBitmap(Result[0]);
-    }
-
-    public File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + ".jpg";
-        File imageFile = null;
-
-        File storageDir = new File(Environment.getExternalStorageDirectory() + "/Pictures", "ootd");
-        if (!storageDir.exists()) {
-            Log.i("mCurrentPhotoPath1", storageDir.toString());
-            storageDir.mkdirs();
-        }
-        imageFile = new File(storageDir, imageFileName);
-        mCurrentPhotoPath = imageFile.getAbsolutePath();
-        return imageFile;
-    }
-
-    private void galleryAddPic() {
-        Log.i("galleryAddPic", "Call");
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        sendBroadcast(mediaScanIntent);
-        Toast.makeText(this, "사진이 앨범에 저장되었습니다.", Toast.LENGTH_SHORT).show();
-    }
-
-    private void cropImage() {
-        Log.i("cropImage", "Call");
-        Log.i("cropImage", "/imageURI" + imageUri);
-
-        Intent cropIntent = new Intent("com.android.camera.action.CROP");
-
-        cropIntent.setDataAndType(photoURI, "image/*");
-        cropIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        cropIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-//        cropIntent.putExtra("outputX", 200); //crop한 이미지의 크기
-//        cropIntent.putExtra("outputY", 200);
-//        cropIntent.putExtra("aspectX", 1); // crop 박스의 비율, 1&1이면 정사각형
-//        cropIntent.putExtra("aspectY", 1);
-//
-//        cropIntent.putExtra("scale", true);
-        cropIntent.putExtra("output", photoURI);
-        // 크랍된 이미지를 해당 경로에 저장
-
-        startActivityForResult(cropIntent, REQUEST_IMAGE_CROP);
+        //Log.d("result", String.valueOf(Result));
+        //Glide.with(this).load(Result[0]).into(iv_image);
+        //iv_image.setImageURI(Uri.parse(Result[0]));
+        /*GridFragment gridFragment = new GridFragment();
+        Bundle bundle = new Bundle();
+        bundle.putStringArray("result", Result);
+        gridFragment.setArguments(bundle);
+*/
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         switch (requestCode) {
-
-            case REQUEST_TAKE_PHOTO:
-                if (resultCode == Activity.RESULT_OK) {
-
-                    try {
-                        File photoFile = null;
-                        photoFile = createImageFile();
-
-                        photoURI = data.getData();
-                        imageUri = Uri.fromFile(photoFile);
-
-                        cropImage();
-                    } catch (Exception e) {
-                    }
+            case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+                CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                if (resultCode == RESULT_OK) {
+                    Uri resultUri = result.getUri();
+                    iv_image.setImageURI(resultUri);
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    Exception error = result.getError();
                 }
-            case REQUEST_IMAGE_CROP:
-                ExifInterface exif = null;
-
-                if (resultCode == Activity.RESULT_OK) {
-                    galleryAddPic();
-                    int exifOrientation;
-                    int exifDegree;
-                    if (exif != null) {
-                        exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                        exifDegree = exifOrientationToDegress(exifOrientation);
-                    } else {
-                        exifDegree = 0;
-                    }
-                    try {
-                        Bitmap bit = MediaStore.Images.Media.getBitmap(getContentResolver(), photoURI);
-                        iv_image.setImageBitmap(rotate(bit, exifDegree));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                break;
         }
-    }
-
-    private int exifOrientationToDegress(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
-            return 90;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
-            return 180;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
-            return 270;
-        }
-        return 0;
-    }
-
-    private Bitmap rotate(Bitmap bitmap, float degree) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degree);
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     private void tedPermission() {
@@ -308,25 +224,45 @@ public class AddImageActivity extends AppCompatActivity {
                 .check();
     }
 
-    class Post extends AsyncTask<String, Void, Bitmap> {
+    class Post extends AsyncTask<String, Void, String[]> {
 
+
+        HttpURLConnection con = null;
+        BufferedReader bufferedReader = null;
         protected void onPreExecute() {
+
             super.onPreExecute();
         }
 
         @Override
-        protected Bitmap doInBackground(String... url) {
-            Bitmap result = null;
-            String baseurl = "http://10.10.105.33/";
+        protected String[] doInBackground(String... url) {
+            Bitmap[] result = null;
+            String[] resultUrlArray = null;
+            String baseurl = "http://"+ myIp +"/";
+
             Log.d("URL", base);
+            //male_btn, female_btn, top_btn, bottom_btn,
+            if (male_btn.isChecked()){
+                if(top_btn.isChecked()){
+                    type = "mantop";
+                }else{
+                    type = "manbottom";
+                }
+            }else{
+                if(top_btn.isChecked()){
+                    type = "womantop";
+                }else{
+                    type = "womanbottom";//동작안함
+                }
+            }
+            System.out.println("type = " + type);
             String a = "source=" + base + "&type=" + type + "&count=" + e + "&async=" + sync;
             try {
-                HttpURLConnection con = null;
-                BufferedReader bufferedReader = null;
+
 
                 try {
-                    String url1 = "http://10.10.105.33/v/search";
-                    URL urls = new URL(url1);
+                    String url1 = baseurl + "/v/search";
+                    URL urls = new URL("http://" + myIp +"/v/search");
                     con = (HttpURLConnection) urls.openConnection();
                     con.setRequestMethod("POST");
                     con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
@@ -343,8 +279,10 @@ public class AddImageActivity extends AppCompatActivity {
                     wr.close();
 
                     if (con.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                        System.out.println("rescode" + con.getResponseCode());
                         Log.d("URL", String.valueOf(con.getResponseCode()));
                     } else {
+                        System.out.println("rescode" + con.getResponseCode());
                         Log.d("URL1", String.valueOf(con.getResponseCode()));
                     }
 
@@ -358,13 +296,13 @@ public class AddImageActivity extends AppCompatActivity {
                     }
                     in.close();
 
-                    Log.d("debug", response.toString());
+                    System.out.println(response.toString());
                     String ar = response.toString();
                     JSONObject jsonObject = new JSONObject(ar);
                     String data = jsonObject.getString("data");
                     JSONObject jsonObject1 = new JSONObject(data);
                     String result1 = jsonObject1.getString("result");
-                    Log.d("data", result1);
+                    Log.d("dddd", result1);
                     JSONArray fin = new JSONArray(result1);
                     String[] arrayprob = new String[fin.length()];
                     String[] arrayurl = new String[fin.length()];
@@ -383,11 +321,14 @@ public class AddImageActivity extends AppCompatActivity {
                     Log.d("arrayprob", String.valueOf(arrayprob));
                     Log.d("arrayurl", String.valueOf(arrayurl));
                     Bitmap[] imgarray = new Bitmap[arrayurl.length];
+                    resultUrlArray = new String[arrayurl.length];
+                    HashSet<String> strings = new HashSet<>();
                     for (int j = 0; j < arrayurl.length; j++) {
-                        Bitmap imgbitmap = GetImage(baseurl + arrayurl[j]);
-                        imgarray[j] = imgbitmap;
+                        strings.add(baseurl + arrayurl[j]);
                     }
-                    result = imgarray[0];
+                    SharedPreferences.Editor edit = getSharedPreferences("info", MODE_PRIVATE).edit();
+                    edit.putStringSet("result", strings);
+                    edit.commit();
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -407,19 +348,23 @@ public class AddImageActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            return result;
+            return resultUrlArray;
         }
 
 
         protected void onProgressUpdate(Void... Void) {
-            text1.setText("진행중");
+
         }
 
-        protected void onPostExecute(Bitmap result) {
-
+        protected void onPostExecute(String[] result) {
+            con.disconnect();
+            Glide.with(activity).load(result[0]).into(iv_image);
+            System.out.println(result.length);
+            Intent intent = new Intent();
+            intent.putExtra("result", result);
+            setResult(RESULT_OK, intent);
+            finish();
             super.onPostExecute(result);
-            text1.setText("");
         }
 
         public Bitmap GetImage(String imageurl) {
@@ -442,6 +387,14 @@ public class AddImageActivity extends AppCompatActivity {
             return imgBitmap;
         }
 
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        this.finish();
     }
 
 }
